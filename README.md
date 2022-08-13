@@ -1,6 +1,6 @@
 # ImageHoster
 
-##Tech Stack
+## Tech Stack
 
 <b>Front End
 <ul>

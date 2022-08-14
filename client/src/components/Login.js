@@ -17,8 +17,13 @@ export default function Login() {
     }
 
     function handleSubmit() {
-        if (buttonText === "Login") {
-            axios.get("http://localhost:5000/").then(res => {
+        if (buttonText === "Register") {
+            const req={
+                name:document.getElementById("name").value,
+                username:document.getElementById("username").value,
+                password:document.getElementById("password").value
+            }
+            axios.post("http://localhost:5000/register",req).then(res => {
                 console.log(res);
             })
         }

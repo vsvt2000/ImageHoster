@@ -69,7 +69,39 @@ func handleRegister(c *fiber.Ctx) error {
 }
 
 func handleImg(c *fiber.Ctx) error {
-	return c.SendString("Img")
+   req:=struct{
+      Query string `json:"query"`
+   }{}
+   if err := c.BodyParser(&req); err != nil {
+      return err
+   }
+   
+   querystmt:=fmt.Sprintf(`select "image" from "UserDetails"."Images" where "key"='%s'`,req.Query)
+
+   result,e:=db.Query(querystmt)
+   Checkerror(e)
+   var temp []byte
+   for result.Next() {
+      result.Scan(&temp)
+   }
+   fmt.Println(*result)
+	return c.Send(temp)
+}
+
+func uploadImg(c *fiber.Ctx) error {
+   req:=struct {
+      Username string `json:"username"`
+      Key string `json:"key"`
+      Image []byte `json:"image"`
+   }{}
+   if err := c.BodyParser(&req); err != nil {
+      return err
+   }
+
+   insertstmt:=fmt.Sprintf(`insert into "UserDetails"."Images"("username","key","image") values ('%s','%s','%s')`,req.Username,req.Key,req.Image)
+   _,e:=db.Exec(insertstmt)
+   Checkerror(e)
+   return c.SendString("Image Upload Successful")
 }
 
 func main() {
@@ -95,7 +127,8 @@ func main() {
    app.Get("/",helloWorld)
    app.Post("/login",handleLogin)
    app.Post("/register",handleRegister)
-   app.Get("/img",handleImg)
+   app.Post("/upload",uploadImg)
+   app.Post("/img",handleImg)
 
    port := os.Getenv("PORT")
    if port == "" {

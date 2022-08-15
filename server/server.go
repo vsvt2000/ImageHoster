@@ -10,6 +10,8 @@ import (
    "github.com/gofiber/fiber/v2/middleware/cors"
 )
 
+var db *sql.DB
+
 func helloWorld(c *fiber.Ctx) error {
 	return c.SendString("Hello World!")
 }
@@ -36,19 +38,6 @@ func handleRegister(c *fiber.Ctx) error {
       return err
   }
   //if the req object has passed till this point, it means the data is ready to be used
-  //Entering DB credentials
-  const (
-   host     = "localhost"
-   port     = 5432
-   user     = "postgres"
-   password = "1234"
-   dbname   = "ImageHoster"
- )
-
- psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
- db, err := sql.Open("postgres", psqlconn)
- Checkerror(err)
- defer db.Close()
 
  insertstmt:=fmt.Sprintf(`insert into "UserDetails"."Users" ("name", "username","password") values('%s', '%s','%s')`,req.Name,req.Username,req.Password)
  //panic(insertstmt)
@@ -68,6 +57,21 @@ func main() {
 
    app.Use(cors.New())
    
+   //Entering DB credentials
+   const (
+     host     = "localhost"
+     sqlport     = 5432
+     user     = "postgres"
+     password = "1234"
+     dbname   = "ImageHoster"
+   )
+
+   psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, sqlport, user, password, dbname)
+   dbobj, err := sql.Open("postgres", psqlconn)
+   db=dbobj
+   Checkerror(err)
+   defer db.Close()
+
    app.Get("/",helloWorld)
    app.Post("/login",handleLogin)
    app.Post("/register",handleRegister)

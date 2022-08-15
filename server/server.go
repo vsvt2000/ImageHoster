@@ -17,7 +17,27 @@ func helloWorld(c *fiber.Ctx) error {
 }
 
 func handleLogin(c *fiber.Ctx) error {
-	return c.SendString("Login")
+   req:=struct {
+      Username string `json:"username"`
+      Password string `json:"password"`
+   }{}
+
+   if err:=c.BodyParser(&req); err!=nil{
+      return err
+   }
+
+   validatestmt:=fmt.Sprintf(`select * from "UserDetails"."Users" where "username"='%s' and "password"='%s'`,req.Username,req.Password)
+
+   rows,e:=db.Query(validatestmt)
+   Checkerror(e)
+   var i int
+   for rows.Next() {
+      i=i+1
+   }
+   if(i==0) {
+      return c.SendString("Login Failed")
+   }
+	return c.SendString("Login Successful")
 }
 func Checkerror(err error) {
    if err != nil {

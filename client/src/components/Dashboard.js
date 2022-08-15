@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import "../App.css";
+import CreateForm from './CreateForm.js'
 
 export default function Dashboard() {
     const items = [
@@ -14,6 +15,8 @@ export default function Dashboard() {
                 "wholesome"
         }
     ];
+
+    const [upload, setupload] = useState(true);
 
     return (
         <div class="h-screen bg-slate-600">
@@ -52,6 +55,13 @@ export default function Dashboard() {
                             })}
                         </tbody>
                     </table>
+                    <button onClick={() => {
+                        setupload(!upload);
+                    }}>New</button>
+                    {(upload === true) ?
+                        <CreateForm />
+                        : null
+                    }
                 </div>
             </div>
         </div>
